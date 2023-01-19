@@ -3,7 +3,7 @@ import threading
 import socket
 
 pygame.init()
-
+# pygame variable
 WIDTH , HEIGHT = 900 , 600
 win = pygame.display.set_mode((WIDTH , HEIGHT))
 pygame.display.set_caption("player_1")
@@ -13,12 +13,12 @@ server_ip , server_port = "192.168.1.68" , 9999
 client = socket.socket()
 client.connect((server_ip , server_port))
 
+# player 2 image
 player_2_paper_image = pygame.image.load('images_for_SPR/player_2_hand.png')
 player_2_rock_image = pygame.image.load('images_for_SPR/player_2_rock.png')
 player_2_scissor_image = pygame.image.load('images_for_SPR/player_2_scissor.png')
 
 def hello(data):
-    print(data)
     if data == 'scissor':
         win.blit(player_2_scissor_image , (595 , 20))
     elif data == 'paper':
@@ -27,15 +27,11 @@ def hello(data):
         win.blit(player_2_rock_image , (595 , 20))
 
 
-
 def recv_message():
     while True:
         data = client.recv(1024)
-        print(f'data send from server{data.decode("utf-8")}')
+        print(data.decode("utf-8"))
         hello(data.decode())
-        
-#    understand above code and see if it slow code or not and move on finished project
-
 # def send_message():
 #     while True:
 #         message = input('enter message: ')
@@ -44,14 +40,17 @@ def recv_message():
 #         thread.start()
 
 # send_message()
-
-thread = threading.Thread(target=recv_message)
-# thread.daemon = True
-thread.start()
-
+thread_starter = True
+if thread_starter:
+    thread = threading.Thread(target=recv_message)
+    thread.start()
+elif thread_starter == False:
+    exit()
 # pygame variable
 
-
+WIDTH , HEIGHT = 900 , 600
+win = pygame.display.set_mode((WIDTH , HEIGHT))
+pygame.display.set_caption("player_1")
 
 def drawing_buttons():
     global rock_button , paper_button , scissor_button
@@ -104,7 +103,8 @@ def click_checker(m_x_pos , m_y_pos):
         client.send(b"scissor")
         win.blit(player_1_scissor_image,(30,10))
 
-def main():   
+def main():
+    global thread_starter
     RUN = True    
     win.fill("black")
     drawing_buttons()
@@ -114,13 +114,12 @@ def main():
                 RUN = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 m_x_pos , m_y_pos = pygame.mouse.get_pos()
-                print(m_x_pos , m_y_pos)
                 click_checker(m_x_pos , m_y_pos)
-                
-        pygame.display.update()
+        pygame.display.update()       
+    thread_starter = False
     pygame.quit()
+    
+    
+
 
 main()
-
-# networking
-
